@@ -12,7 +12,31 @@ services:
     volumes:
       - sensevoice-models:/models
     ports:
-      - "50000:50000"
+      - "5000:5000"
+    restart: on-failure:5
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
+    gpus: all
+
+  # Gradio test UI — same image and model cache as the API service.
+  # Start with: docker compose --profile webui up webui
+  webui:
+    container_name: sensevoice-webui
+    profiles: ["webui"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "webui.py"]
+    environment:
+      MODELSCOPE_CACHE: /models
+      GRADIO_SERVER_NAME: 0.0.0.0
+      GRADIO_SERVER_PORT: "7860"
+    volumes:
+      - sensevoice-models:/models
+    ports:
+      - "7860:7860"
     restart: on-failure:5
     logging:
       options:
