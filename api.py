@@ -3,6 +3,7 @@
 
 import os, re
 from fastapi import FastAPI, File, Form, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from typing_extensions import Annotated
 from typing import List
@@ -32,6 +33,15 @@ m.eval()
 regex = r"<\|.*\|>"
 
 app = FastAPI()
+
+# The web UI lets users point their browser at any deployment of this API,
+# so cross-origin requests must be allowed.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/", response_class=HTMLResponse)

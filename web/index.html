@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SenseVoice STT</title>
+  </head>
+  <body>
+    <main class="app">
+      <h1>SenseVoice Speech-to-Text</h1>
+
+      <section class="controls">
+        <div class="field api-url">
+          <label for="api-url">API URL</label>
+          <input
+            type="url"
+            id="api-url"
+            placeholder="http://<gpu-server>:5000 (empty = same origin)"
+          />
+        </div>
+        <div class="field">
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="auto" selected>auto</option>
+            <option value="zh">zh</option>
+            <option value="en">en</option>
+            <option value="yue">yue</option>
+            <option value="ja">ja</option>
+            <option value="ko">ko</option>
+          </select>
+        </div>
+        <label class="field checkbox">
+          <input type="checkbox" id="use-itn" />
+          Inverse text normalization (numbers, punctuation)
+        </label>
+      </section>
+
+      <section class="inputs">
+        <button id="record-button" type="button">🎙️ Start recording</button>
+        <span class="divider">or</span>
+        <label class="file-label">
+          📁 Choose audio files
+          <input type="file" id="file-input" accept="audio/*" multiple hidden />
+        </label>
+      </section>
+
+      <p id="status" class="status"></p>
+      <section id="results" class="results"></section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
