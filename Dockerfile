@@ -27,9 +27,25 @@ ENV PIP_BREAK_SYSTEM_PACKAGES=1
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Fail the build early if the CUDA-enabled torch got replaced during resolution,
-# or if torchaudio's CUDA build no longer matches torch's (importing torchaudio
-# runs its torch/torchaudio CUDA version check).
-RUN python -c "import torch, torchaudio; print('torch', torch.__version__, 'cuda', torch.version.cuda, '| torchaudio', torchaudio.__version__); assert torch.version.cuda.startswith('13.'), torch.version.cuda"
+# if torchaudio's CUDA build no longer matches torch's (checked on import), or
+# if audio decoding is broken (torchaudio.load delegates to torchcodec+FFmpeg,
+# neither of which is validated by a plain import of torchaudio).
+RUN python - <<'EOF'
+import math, struct, wave
+import torch, torchaudio
+
+print("torch", torch.__version__, "cuda", torch.version.cuda, "| torchaudio", torchaudio.__version__)
+assert torch.version.cuda.startswith("13."), torch.version.cuda
+
+with wave.open("/tmp/probe.wav", "wb") as w:
+    w.setnchannels(1)
+    w.setsampwidth(2)
+    w.setframerate(16000)
+    w.writeframes(b"".join(struct.pack("<h", int(10000 * math.sin(i / 10))) for i in range(1600)))
+waveform, fs = torchaudio.load("/tmp/probe.wav")
+assert fs == 16000 and waveform.numel() == 1600, (fs, waveform.shape)
+print("torchaudio.load OK (torchcodec backend works)")
+EOF
 
 # Now copy the rest of your code
 COPY . /app

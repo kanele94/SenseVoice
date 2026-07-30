@@ -2,6 +2,9 @@
 # For CUDA-specific wheels, install a matching torch/torchaudio pair first.
 torch>=2.12.1
 torchaudio>=2.11.0
+# torchaudio>=2.9 delegates load()/save() to TorchCodec (needs FFmpeg at runtime);
+# 0.12+ supports torch>=2.11.
+torchcodec>=0.15.0
 modelscope
 huggingface
 huggingface_hub
