@@ -1,6 +1,7 @@
 import { AudioRecorder } from "./audio-recorder.js";
 import { blobToWav16k } from "./wav-encoder.js";
 import { transcribe } from "./asr-client.js";
+import { createAudioCard } from "./audio-card.js";
 import "./style.css";
 
 const apiUrlInput = document.getElementById("api-url");
@@ -56,6 +57,14 @@ fileInput.addEventListener("change", async () => {
 });
 
 async function runTranscription(files) {
+  // Every clip becomes a playground card immediately, so it is playable
+  // while (and after) transcription runs.
+  const cards = files.map((file) => {
+    const card = createAudioCard(file);
+    resultsEl.prepend(card.element);
+    return card;
+  });
+
   setStatus(`Transcribing ${files.map((f) => f.name).join(", ")}…`);
   try {
     const results = await transcribe(files, {
@@ -63,34 +72,18 @@ async function runTranscription(files) {
       lang: languageSelect.value,
       useItn: useItnCheckbox.checked,
     });
-    renderResults(results);
-    setStatus(results.length > 0 ? "Done." : "No speech detected.");
+    cards.forEach((card, i) => {
+      const item = results.find((r) => r.key === files[i].name) ?? results[i];
+      if (item) {
+        card.setResult(item);
+      } else {
+        card.setStatus("No speech detected.", true);
+      }
+    });
+    setStatus("Done.");
   } catch (error) {
+    cards.forEach((card) => card.setStatus("Transcription failed.", true));
     setStatus(error.message, true);
-  }
-}
-
-function renderResults(results) {
-  for (const item of results) {
-    const card = document.createElement("article");
-    card.className = "result-card";
-
-    const title = document.createElement("h3");
-    title.textContent = item.key;
-
-    const text = document.createElement("p");
-    text.className = "result-text";
-    text.textContent = item.text;
-
-    const raw = document.createElement("details");
-    const summary = document.createElement("summary");
-    summary.textContent = "Raw output (language/emotion tags)";
-    const rawText = document.createElement("code");
-    rawText.textContent = item.raw_text;
-    raw.append(summary, rawText);
-
-    card.append(title, text, raw);
-    resultsEl.prepend(card);
   }
 }
 

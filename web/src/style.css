@@ -106,6 +106,34 @@ select {
   opacity: 0.7;
 }
 
+.player {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.35rem;
+}
+
+.download-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.download-link:hover {
+  opacity: 1;
+}
+
+.card-status {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.card-status.error {
+  color: #e74c3c;
+  opacity: 1;
+}
+
 .result-text {
   margin: 0 0 0.75rem;
   font-size: 1.1rem;
