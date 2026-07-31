@@ -1,8 +1,11 @@
 # SenseVoice Web UI
 
-Minimal Vite site for the SenseVoice STT API (`POST /api/v1/asr`). Record from
-the microphone or upload audio files; the browser converts audio to 16 kHz mono
-WAV before uploading.
+Minimal Vite site for the SenseVoice STT API. Record from the microphone or
+upload audio files (`POST /api/v1/asr`) — the browser converts audio to 16 kHz
+mono WAV before uploading — or paste an audio URL (`POST /api/v1/asr/url`),
+which the API server downloads itself, so the audio never passes through the
+browser. Several URLs can be submitted at once, separated by commas or spaces;
+the URL must be reachable *from the API server*, not just from your machine.
 
 ## Run
 

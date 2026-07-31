@@ -1,22 +1,24 @@
 // One playground card per audio clip: playback player, transcription
-// status, and the transcript once it arrives. The object URL is kept for
-// the lifetime of the page so the clip stays replayable.
+// status, and the transcript once it arrives. `src` is an object URL for
+// local clips (kept for the lifetime of the page so they stay replayable)
+// or the remote audio URL when the server fetched the audio itself.
 
-export function createAudioCard(file) {
+export function createAudioCard({ name, src }) {
   const card = document.createElement("article");
   card.className = "result-card";
 
   const title = document.createElement("h3");
-  title.textContent = file.name;
+  title.textContent = name;
 
   const player = document.createElement("audio");
   player.controls = true;
-  player.src = URL.createObjectURL(file);
+  player.src = src;
   player.className = "player";
 
   const download = document.createElement("a");
-  download.href = player.src;
-  download.download = file.name;
+  download.href = src;
+  // Cross-origin sources ignore the download hint and just open instead.
+  download.download = name;
   download.textContent = "⬇ download";
   download.className = "download-link";
 

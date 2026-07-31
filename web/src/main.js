@@ -1,12 +1,14 @@
 import { AudioRecorder } from "./audio-recorder.js";
 import { blobToWav16k } from "./wav-encoder.js";
-import { transcribe } from "./asr-client.js";
+import { transcribe, transcribeUrls, keyFromUrl } from "./asr-client.js";
 import { createAudioCard } from "./audio-card.js";
 import "./style.css";
 
 const apiUrlInput = document.getElementById("api-url");
 const recordButton = document.getElementById("record-button");
 const fileInput = document.getElementById("file-input");
+const urlForm = document.getElementById("url-form");
+const audioUrlInput = document.getElementById("audio-url");
 const languageSelect = document.getElementById("language");
 const useItnCheckbox = document.getElementById("use-itn");
 const statusEl = document.getElementById("status");
@@ -56,24 +58,43 @@ fileInput.addEventListener("change", async () => {
   if (files.length > 0) await runTranscription(files);
 });
 
+urlForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  // Several URLs may be pasted at once, separated by commas or whitespace.
+  const urls = audioUrlInput.value.split(/[\s,]+/).filter(Boolean);
+  if (urls.length === 0) return;
+  audioUrlInput.value = "";
+  await runUrlTranscription(urls);
+});
+
 async function runTranscription(files) {
+  const sources = files.map((file) => ({ name: file.name, src: URL.createObjectURL(file) }));
+  await runJob(sources, (options) => transcribe(files, options));
+}
+
+async function runUrlTranscription(urls) {
+  const sources = urls.map((url) => ({ name: keyFromUrl(url), src: url }));
+  await runJob(sources, (options) => transcribeUrls(urls, options));
+}
+
+async function runJob(sources, transcribeFn) {
   // Every clip becomes a playground card immediately, so it is playable
   // while (and after) transcription runs.
-  const cards = files.map((file) => {
-    const card = createAudioCard(file);
+  const cards = sources.map((source) => {
+    const card = createAudioCard(source);
     resultsEl.prepend(card.element);
     return card;
   });
 
-  setStatus(`Transcribing ${files.map((f) => f.name).join(", ")}…`);
+  setStatus(`Transcribing ${sources.map((s) => s.name).join(", ")}…`);
   try {
-    const results = await transcribe(files, {
+    const results = await transcribeFn({
       apiUrl: apiUrlInput.value.trim(),
       lang: languageSelect.value,
       useItn: useItnCheckbox.checked,
     });
     cards.forEach((card, i) => {
-      const item = results.find((r) => r.key === files[i].name) ?? results[i];
+      const item = results.find((r) => r.key === sources[i].name) ?? results[i];
       if (item) {
         card.setResult(item);
       } else {

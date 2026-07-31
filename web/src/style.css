@@ -61,7 +61,25 @@ select {
   flex-wrap: wrap;
 }
 
+.url-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.url-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid light-dark(#c4c8ce, #3a3f47);
+  background: light-dark(#ffffff, #23262d);
+  color: inherit;
+  font-size: 0.95rem;
+}
+
 #record-button,
+.url-form button,
 .file-label {
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
