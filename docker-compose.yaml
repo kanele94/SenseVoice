@@ -24,7 +24,6 @@ services:
   # sensevoice service. Start with: docker compose --profile webui up webui
   webui:
     container_name: sensevoice-webui
-    profiles: ["webui"]
     build:
       context: ./web
       dockerfile: Dockerfile
