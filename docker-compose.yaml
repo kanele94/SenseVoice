@@ -10,10 +10,7 @@ services:
       MODELSCOPE_CACHE: /models
       SENSEVOICE_DEVICE: cpu
     volumes:
-      # Pre-fetched ModelScope cache. A bind mount, not a named volume: the
-      # contents must be the ones on disk here, and a named volume would only
-      # ever be seeded from the image while still empty.
-      - ./models:/models
+      - sensevoice-models:/models
     restart: on-failure:5
     logging:
       options:
@@ -36,3 +33,6 @@ services:
       options:
         max-size: "5m"
         max-file: "3"
+
+volumes:
+  sensevoice-models:
