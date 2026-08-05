@@ -10,7 +10,10 @@ services:
       MODELSCOPE_CACHE: /models
       SENSEVOICE_DEVICE: cpu
     volumes:
-      - sensevoice-models:/models
+      # Bind mount, not a named volume: the weights are pre-fetched into
+      # ./models on the host, and a named volume would shadow them and make
+      # the API re-download on every fresh deployment.
+      - ./models:/models
     restart: on-failure:5
     logging:
       options:
@@ -33,6 +36,3 @@ services:
       options:
         max-size: "5m"
         max-file: "3"
-
-volumes:
-  sensevoice-models:
