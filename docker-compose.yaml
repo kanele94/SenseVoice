@@ -8,15 +8,17 @@ services:
       dockerfile: Dockerfile
     environment:
       MODELSCOPE_CACHE: /models
-      SENSEVOICE_DEVICE: ${SENSEVOICE_DEVICE:-auto}
+      SENSEVOICE_DEVICE: cpu
     volumes:
-      - sensevoice-models:/models
+      # Pre-fetched ModelScope cache. A bind mount, not a named volume: the
+      # contents must be the ones on disk here, and a named volume would only
+      # ever be seeded from the image while still empty.
+      - ./models:/models
     restart: on-failure:5
     logging:
       options:
         max-size: "5m"
         max-file: "3"
-    gpus: all
 
   # Vite STT website (web/) served by nginx; /api is proxied to the
   # sensevoice service. Start with: docker compose --profile webui up webui
@@ -34,6 +36,3 @@ services:
       options:
         max-size: "5m"
         max-file: "3"
-
-volumes:
-  sensevoice-models:

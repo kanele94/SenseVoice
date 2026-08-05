@@ -22,5 +22,7 @@ outputs*
 emotion2vec*
 GPT-SoVITS*
 modelscope_models
+models/
+
 examples/aishell/llm_asr_nar/*
 node_modules/

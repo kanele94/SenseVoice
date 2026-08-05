@@ -47,23 +47,22 @@ assert fs == 16000 and waveform.numel() == 1600, (fs, waveform.shape)
 print("torchaudio.load OK (torchcodec backend works)")
 EOF
 
-# Now copy the rest of your code
-COPY . /app
-
-
-# Optional: preload model weights during build (saves runtime download)
-# RUN python -c "from funasr import AutoModel; AutoModel(model='iic/SenseVoiceSmall')"
-
-# Expose FastAPI port
-EXPOSE 5000
-
 # Environment variables
 ENV SENSEVOICE_DEVICE=auto
 ENV PYTHONUNBUFFERED=1
 ENV MODELSCOPE_CACHE=/models
 
-# Create model cache directory (helps reuse between restarts)
+# api.py loads the model at import time, so uvicorn does not bind its port
+# until the weights are in place — with an empty cache every request is
+# refused for as long as the ModelScope download takes. Mount pre-fetched
+# weights over /models (see docker-compose.yaml) to avoid that cold start.
 RUN mkdir -p /models
+
+# Now copy the rest of your code
+COPY . /app
+
+# Expose FastAPI port
+EXPOSE 5000
 
 # Start FastAPI app
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "5000"]
