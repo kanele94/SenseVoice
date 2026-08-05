@@ -12,7 +12,7 @@ services:
     volumes:
       - sensevoice-models:/models
     ports:
-      - "5000:5000"
+      - "3110:5000"
     restart: on-failure:5
     logging:
       options:
@@ -31,7 +31,7 @@ services:
     depends_on:
       - sensevoice
     ports:
-      - "5173:80"
+      - "3111:80"
     restart: on-failure:5
     logging:
       options:
